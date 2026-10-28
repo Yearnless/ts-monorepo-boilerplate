@@ -1,0 +1,33 @@
+{
+  "name": "ts-monorepo-boilerplate",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.7.2",
+    "eslint": "^8.57.0"
+  },
+  "keywords": [
+    "monorepo",
+    "turbo",
+    "typescript",
+    "boilerplate",
+    "ci-diff-changed"
+  ],
+  "author": "Yearnless",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yearnless/ts-monorepo-boilerplate"
+  }
+}

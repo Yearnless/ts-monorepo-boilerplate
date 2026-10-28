@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect-changes:
+    name: Detect changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.diff.outputs.api }}
+      shared: ${{ steps.diff.outputs.shared }}
+      web: ${{ steps.diff.outputs.web }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: Yearnless/ci-diff-changed@v1
+        id: diff
+        with:
+          base-ref: origin/main
+          pattern: 'packages/(api|shared|web)/'
+
+  api:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck --filter=@monorepo/api
+      - run: npm run test --filter=@monorepo/api
+      - run: npm run build --filter=@monorepo/api
+
+  shared:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.shared == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck --filter=@monorepo/shared
+      - run: npm run build --filter=@monorepo/shared
+
+  web:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+      - run: npm ci
+      - run: npm run typecheck --filter=@monorepo/web
+      - run: npm run test --filter=@monorepo/web
+      - run: npm run build --filter=@monorepo/web
